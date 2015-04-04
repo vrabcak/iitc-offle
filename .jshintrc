@@ -1,0 +1,9 @@
+{
+    "browser": true,
+    "globals": {
+        "L": true,
+        "map": true,
+        "$": true,
+        "GM_info": true
+    }
+}
