@@ -2,7 +2,7 @@
 // @id             iitc-plugin-offle
 // @name           IITC plugin: offle
 // @category       Misc
-// @version        0.0.4b
+// @version        0.0.4
 // @namespace      https://pokus
 // @description    Offle
 // @include        https://www.ingress.com/intel*
@@ -92,14 +92,14 @@ function wrapper(plugin_info) {
               '}' +
               '.offle-X-visited {' +
               'font-size: 10px;' +
-              'color: #FFFF00;' +
+              'color: #FFCE00;' +
               'font-family: monospace;'+
               'text-align: center;' +
               'pointer-events: none;' +
               '}' +
               '.offle-X-captured {' +
               'font-size: 10px;' +
-              'color: #00FF00;' +
+              'color: #00BB00;' +
               'font-family: monospace;'+
               'text-align: center;' +
               'pointer-events: none;' +
