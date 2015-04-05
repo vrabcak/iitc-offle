@@ -2,8 +2,8 @@
 // @id             iitc-plugin-offle
 // @name           IITC plugin: offle
 // @category       Misc
-// @version        0.0.4
-// @namespace      https://pokus
+// @version        0.1.0
+// @namespace      https://github.com/vrabcak/iitc-offle
 // @description    Offle
 // @include        https://www.ingress.com/intel*
 // @include        http://www.ingress.com/intel*

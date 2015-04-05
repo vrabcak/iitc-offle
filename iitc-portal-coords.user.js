@@ -2,8 +2,8 @@
 // @id             iitc-plugin-portal-coords
 // @name           IITC plugin: portal-coords
 // @category       Misc
-// @version        0.0.1
-// @namespace      https://pokus
+// @version        0.1.0
+// @namespace      https://github.com/vrabcak/iitc-offle
 // @description    Portal coords
 // @include        https://www.ingress.com/intel*
 // @include        http://www.ingress.com/intel*
