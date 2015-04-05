@@ -2,7 +2,7 @@
 // @id             iitc-plugin-offle
 // @name           IITC plugin: offle
 // @category       Misc
-// @version        0.0.3
+// @version        0.0.4b
 // @namespace      https://pokus
 // @description    Offle
 // @include        https://www.ingress.com/intel*
@@ -38,7 +38,7 @@ function wrapper(plugin_info) {
 
     window.plugin.offle.addPortal = function (guid, name, latLng) {
         window.plugin.offle.portalDb[guid] = latLng;
-        localStorage.setItem('portalDb', JSON.stringify(window.plugin.offle.portalDb));
+        window.plugin.offle.dirtyDb = true;     //mark Db dirty to by stored on mapDataRefreshEnd
         window.plugin.offle.renderPortal(guid, name, latLng);
         window.plugin.offle.updatePortalCounter(); 
     };
@@ -58,6 +58,13 @@ function wrapper(plugin_info) {
 
     };
 
+    window.plugin.offle.mapDataRefreshEnd = function () {
+        if (window.plugin.offle.dirtyDb) {
+            console.log("Storing new portals to localStorage");
+            localStorage.setItem('portalDb', JSON.stringify(window.plugin.offle.portalDb));
+        }
+        window.plugin.offle.dirtyDb = false;
+    };
 
     window.plugin.offle.setupLayer = function() {
         window.plugin.offle.portalLayerGroup = new L.LayerGroup();
@@ -161,6 +168,7 @@ function wrapper(plugin_info) {
         });
         map.on('moveend',  window.plugin.offle.onMapMove);
         window.addHook('portalAdded', window.plugin.offle.portalAdded);
+        window.addHook('mapDataRefreshEnd', window.plugin.offle.mapDataRefreshEnd);
     };
     // PLUGIN END //////////////////////////////////////////////////////////
 
