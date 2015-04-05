@@ -29,11 +29,7 @@ function wrapper(plugin_info) {
 
     // Use portal add event to save it to db 
     window.plugin.offle.portalAdded = function (data) {
-
-        data.portal.on('add', function () {
-            //console.log("**",this.options.guid, this.options.data.title, this.getLatLng());
-            window.plugin.offle.addPortal(this.options.guid, this.options.data.title, this.getLatLng());
-        });
+        window.plugin.offle.addPortal(data.portal.options.guid, data.portal.options.data.title, data.portal.getLatLng());
     };
 
     window.plugin.offle.addPortal = function (guid, name, latLng) {
