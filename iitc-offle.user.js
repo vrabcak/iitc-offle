@@ -40,9 +40,22 @@ function wrapper(plugin_info) {
     };
 
     window.plugin.offle.renderPortal = function (guid, name, latLng) {  
-        var portalMarker = L.marker(latLng, {
+        var portalMarker,
+            iconCSSClass = 'offle-X-basic',
+            uniqueInfo = window.plugin.uniques.uniques[guid];
+
+        if (uniqueInfo) {
+            if (uniqueInfo.visited) {
+               iconCSSClass = 'offle-X-visited';
+            }
+            if (uniqueInfo.captured) {
+               iconCSSClass = 'offle-X-captured';
+            }
+        }
+
+        portalMarker = L.marker(latLng, {
             icon: L.divIcon({
-                className: 'plugin-offle',
+                className: iconCSSClass,
                 iconAnchor: [5,5],
                 iconSize: [10,10],
                 html: "X"
@@ -70,13 +83,28 @@ function wrapper(plugin_info) {
     window.plugin.offle.setupCSS = function() {
         $("<style>")
         .prop("type", "text/css")
-        .html('.plugin-offle {' +
+        .html('.offle-X-basic {' +
               'font-size: 10px;' +
               'color: #FF6200;' +
               'font-family: monospace;'+
               'text-align: center;' +
               'pointer-events: none;' +
-              '}')
+              '}' +
+              '.offle-X-visited {' +
+              'font-size: 10px;' +
+              'color: #FFFF00;' +
+              'font-family: monospace;'+
+              'text-align: center;' +
+              'pointer-events: none;' +
+              '}' +
+              '.offle-X-captured {' +
+              'font-size: 10px;' +
+              'color: #00FF00;' +
+              'font-family: monospace;'+
+              'text-align: center;' +
+              'pointer-events: none;' +
+              '}'
+             )
         .appendTo("head");
     };
 
