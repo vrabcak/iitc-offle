@@ -2,7 +2,7 @@
 // @id             iitc-plugin-offle
 // @name           IITC plugin: offle
 // @category       Misc
-// @version        0.1.0
+// @version        0.1.1
 // @namespace      https://github.com/vrabcak/iitc-offle
 // @description    Offle
 // @include        https://www.ingress.com/intel*
@@ -40,9 +40,12 @@ function wrapper(plugin_info) {
     };
 
     window.plugin.offle.renderPortal = function (guid, name, latLng) {  
-        var portalMarker,
-            iconCSSClass = 'offle-X-basic',
+        var portalMarker, uniqueInfo,
+            iconCSSClass = 'offle-X-basic';
+
+        if (window.plugin.uniques) {
             uniqueInfo = window.plugin.uniques.uniques[guid];
+        }
 
         if (uniqueInfo) {
             if (uniqueInfo.visited) {
