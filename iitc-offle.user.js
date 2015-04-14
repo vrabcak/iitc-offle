@@ -2,7 +2,7 @@
 // @id             iitc-plugin-offle
 // @name           IITC plugin: offle
 // @category       Misc
-// @version        0.1.1
+// @version        0.2.0-beta
 // @namespace      https://github.com/vrabcak/iitc-offle
 // @description    Offle
 // @include        https://www.ingress.com/intel*
@@ -25,6 +25,7 @@ function wrapper(plugin_info) {
     // use own namespace for plugin
     window.plugin.offle = function () {};
     window.plugin.offle.portalDb = {};
+    window.plugin.offle.lastAddedDb = [];
 
 
     // Use portal add event to save it to db 
@@ -33,6 +34,7 @@ function wrapper(plugin_info) {
     };
 
     window.plugin.offle.addPortal = function (guid, name, latLng) {
+        window.plugin.offle.lastAddedDb.push({name:name, latLng:latLng});
         window.plugin.offle.portalDb[guid] = latLng;
         window.plugin.offle.dirtyDb = true;     //mark Db dirty to by stored on mapDataRefreshEnd
         window.plugin.offle.renderPortal(guid, name, latLng);
@@ -164,11 +166,20 @@ function wrapper(plugin_info) {
             '</span></div>' +
             '<div> Visible portals:' +
             '<span id="visible-portals-counter">x</span></div>' +
+            '<div style="border-bottom: 60px;">'+
+            '<button onclick="window.plugin.offle.showLA();return false;">New portals</button>' +
+            '</div>' +
             '<button onclick="window.plugin.offle.clearDb();return false;">Clear all offline portals</button>' +
             '</div>';
         $('#toolbox').append('<a id="offle-show-info" onclick="window.plugin.offle.showDialog();">Offle</a> ');
-    };
 
+        window.plugin.offle.lastAddedDialogHtml = ''+
+            '<div id="offle-last-added-list">'+
+            'placeholder <br/>' +
+            'placeholder'+
+            '</div>';
+
+    };
 
 
     window.plugin.offle.showDialog = function() {
@@ -177,6 +188,15 @@ function wrapper(plugin_info) {
         window.plugin.offle.getVisiblePortals();
     };
 
+
+    window.plugin.offle.showLA = function() {
+        var portalListHtml = window.plugin.offle.lastAddedDb.map( function (portal) {
+            return portal.name;
+        }).join('<br />');
+        window.dialog({html: window.plugin.offle.lastAddedDialogHtml, title: 'Portals added since last session:', modal: false, id: 'offle-LA'});
+        $('#offle-last-added-list').html(portalListHtml);
+
+    };
 
     var setup = function () {        
         var portalDb = window.plugin.offle.portalDb = JSON.parse(localStorage.getItem('portalDb')) || {};
