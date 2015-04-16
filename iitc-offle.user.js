@@ -40,6 +40,7 @@ function wrapper(plugin_info) {
             window.plugin.offle.dirtyDb = true;     //mark Db dirty to by stored on mapDataRefreshEnd
             window.plugin.offle.renderPortal(guid, name, latLng);
             window.plugin.offle.updatePortalCounter();
+            window.plugin.offle.updateLAList();
         }
     };
 
@@ -76,7 +77,7 @@ function wrapper(plugin_info) {
 
     window.plugin.offle.mapDataRefreshEnd = function () {
         if (window.plugin.offle.dirtyDb) {
-            console.log("Storing new portals to localStorage");
+            //console.log("Storing new portals to localStorage");
             localStorage.setItem('portalDb', JSON.stringify(window.plugin.offle.portalDb));
         }
         window.plugin.offle.dirtyDb = false;
@@ -169,9 +170,10 @@ function wrapper(plugin_info) {
             '<div> Visible portals:' +
             '<span id="visible-portals-counter">x</span></div>' +
             '<div style="border-bottom: 60px;">'+
-            '<button onclick="window.plugin.offle.showLA();return false;">New portals</button>' +
-            '</div>' +
-            '<button onclick="window.plugin.offle.clearDb();return false;">Clear all offline portals</button>' +
+            '<button onclick="window.plugin.offle.showLAWindow();return false;">New portals</button>' +
+            '</div><br/><br/><br/>' +
+            '<button onclick="window.plugin.offle.clearDb();return false;" style="font-size: 5px;">' +
+            'Clear all offline portals</button>' +
             '</div>';
         $('#toolbox').append('<a id="offle-show-info" onclick="window.plugin.offle.showDialog();">Offle</a> ');
 
@@ -191,16 +193,21 @@ function wrapper(plugin_info) {
     };
 
 
-    window.plugin.offle.showLA = function() {
+    window.plugin.offle.showLAWindow = function() {
+
+        window.dialog({html: window.plugin.offle.lastAddedDialogHtml, title: 'Portals added since last session:', modal: false, id: 'offle-LA'});
+        window.plugin.offle.updateLAList();
+
+    };
+
+    window.plugin.offle.updateLAList = function () { /// update list of last added portals
         var portalListHtml = window.plugin.offle.lastAddedDb.map( function (portal) {
             var lat = portal.latLng.lat,
                 lng = portal.latLng.lng;
             return '<a onclick="window.selectPortalByLatLng(' + lat + ', ' +  lng +');return false"'+
                      'href="/intel?pll=' + portal.latLng.lat + ',' + portal.latLng.lng + '">' + portal.name + '</a>';
         }).join('<br />');
-        window.dialog({html: window.plugin.offle.lastAddedDialogHtml, title: 'Portals added since last session:', modal: false, id: 'offle-LA'});
         $('#offle-last-added-list').html(portalListHtml);
-
     };
 
     var setup = function () {        
