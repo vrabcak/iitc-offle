@@ -186,7 +186,8 @@ function wrapper(plugin_info) {
             '<div id="offle-last-added-list">'+
             'placeholder <br/>' +
             'placeholder'+
-            '</div>';
+            '</div>'+
+            '<button onclick="window.plugin.offle.clearLADb()">Clear</div>';
 
         $('body').append('<div class="offle-portal-counter" onclick="window.plugin.offle.showLAWindow();">0</div>');
 
@@ -223,6 +224,12 @@ function wrapper(plugin_info) {
              $('.offle-portal-counter').css('display','block').html(''+count);
         }
 
+    };
+
+    window.plugin.offle.clearLADb = function () {
+        window.plugin.offle.lastAddedDb = [];
+        window.plugin.offle.updateLAList();
+        $('.offle-portal-counter').css('display','none');
     };
 
     var setup = function () {        
