@@ -2,7 +2,7 @@
 // @id             iitc-plugin-offle
 // @name           IITC plugin: offle
 // @category       Misc
-// @version        0.2.0-beta
+// @version        0.2.0
 // @namespace      https://github.com/vrabcak/iitc-offle
 // @description    Offle
 // @include        https://www.ingress.com/intel*
