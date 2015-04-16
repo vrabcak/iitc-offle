@@ -40,6 +40,7 @@ function wrapper(plugin_info) {
             window.plugin.offle.dirtyDb = true;     //mark Db dirty to by stored on mapDataRefreshEnd
             window.plugin.offle.renderPortal(guid, name, latLng);
             window.plugin.offle.updatePortalCounter();
+            window.plugin.offle.updateLACounter();
             window.plugin.offle.updateLAList();
         }
     };
@@ -111,7 +112,11 @@ function wrapper(plugin_info) {
               'font-family: monospace;'+
               'text-align: center;' +
               'pointer-events: none;' +
-              '}'
+              '}' +
+              '.offle-portal-counter {' +
+              'display: none; position: absolute; top:0; left: 40vh;' +
+              'background-color: orange; z-index: 4002; cursor:pointer;}'
+
              )
         .appendTo("head");
     };
@@ -160,7 +165,7 @@ function wrapper(plugin_info) {
         window.plugin.offle.updatePortalCounter();
     };
 
-    window.plugin.offle.setupDialog = function() {
+    window.plugin.offle.setupHtml = function() {
         window.plugin.offle.dialogHtml = '<div id="offle-info">'+
             '<div>' +
             '<div> Offline portals count:' +
@@ -182,6 +187,8 @@ function wrapper(plugin_info) {
             'placeholder <br/>' +
             'placeholder'+
             '</div>';
+
+        $('body').append('<div class="offle-portal-counter" onclick="window.plugin.offle.showLAWindow();">0</div>');
 
     };
 
@@ -210,11 +217,19 @@ function wrapper(plugin_info) {
         $('#offle-last-added-list').html(portalListHtml);
     };
 
+    window.plugin.offle.updateLACounter = function () {
+        var count = window.plugin.offle.lastAddedDb.length;
+        if (count > 0) {
+             $('.offle-portal-counter').css('display','block').html(''+count);
+        }
+
+    };
+
     var setup = function () {        
         var portalDb = window.plugin.offle.portalDb = JSON.parse(localStorage.getItem('portalDb')) || {};
         window.plugin.offle.setupLayer();
         window.plugin.offle.setupCSS();
-        window.plugin.offle.setupDialog();
+        window.plugin.offle.setupHtml();
 
         if (Object.keys(portalDb).length > 0) {
             window.plugin.offle.renderVisiblePortals();
