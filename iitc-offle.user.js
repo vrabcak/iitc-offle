@@ -34,11 +34,13 @@ function wrapper(plugin_info) {
     };
 
     window.plugin.offle.addPortal = function (guid, name, latLng) {
-        window.plugin.offle.lastAddedDb.push({name:name, latLng:latLng});
-        window.plugin.offle.portalDb[guid] = latLng;
-        window.plugin.offle.dirtyDb = true;     //mark Db dirty to by stored on mapDataRefreshEnd
-        window.plugin.offle.renderPortal(guid, name, latLng);
-        window.plugin.offle.updatePortalCounter(); 
+        if (!(guid in window.plugin.offle.portalDb)) {
+            window.plugin.offle.lastAddedDb.push({name:name, latLng:latLng});
+            window.plugin.offle.portalDb[guid] = latLng;
+            window.plugin.offle.dirtyDb = true;     //mark Db dirty to by stored on mapDataRefreshEnd
+            window.plugin.offle.renderPortal(guid, name, latLng);
+            window.plugin.offle.updatePortalCounter();
+        }
     };
 
     window.plugin.offle.renderPortal = function (guid, name, latLng) {  
@@ -191,7 +193,10 @@ function wrapper(plugin_info) {
 
     window.plugin.offle.showLA = function() {
         var portalListHtml = window.plugin.offle.lastAddedDb.map( function (portal) {
-            return portal.name;
+            var lat = portal.latLng.lat,
+                lng = portal.latLng.lng;
+            return '<a onclick="window.selectPortalByLatLng(' + lat + ', ' +  lng +');return false"'+
+                     'href="/intel?pll=' + portal.latLng.lat + ',' + portal.latLng.lng + '">' + portal.name + '</a>';
         }).join('<br />');
         window.dialog({html: window.plugin.offle.lastAddedDialogHtml, title: 'Portals added since last session:', modal: false, id: 'offle-LA'});
         $('#offle-last-added-list').html(portalListHtml);
