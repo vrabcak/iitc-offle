@@ -2,7 +2,7 @@
 // @id             iitc-plugin-offle
 // @name           IITC plugin: offle
 // @category       Misc
-// @version        0.2.0
+// @version        0.2.1
 // @namespace      https://github.com/vrabcak/iitc-offle
 // @description    Offle
 // @include        https://www.ingress.com/intel*
@@ -219,7 +219,7 @@ function wrapper(plugin_info) {
                 title: 'Portals added since last session:',
                 modal: false,
                 id: 'offle-LA',
-
+                height: $(window).height() * 0.45
             });
             window.plugin.offle.updateLAList();
 
