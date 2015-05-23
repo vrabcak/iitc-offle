@@ -26,6 +26,7 @@ function wrapper(plugin_info) {
         window.plugin.offle = function () {};
         window.plugin.offle.portalDb = {};
         window.plugin.offle.lastAddedDb = [];
+        window.plugin.offle.symbol = '&bull;';
 
 
         // Use portal add event to save it to db
@@ -74,7 +75,7 @@ function wrapper(plugin_info) {
                     className: iconCSSClass,
                     iconAnchor: [15, 23],
                     iconSize: [30, 30],
-                    html: "&bull;"
+                    html: window.plugin.offle.symbol
                 }),
                 name: name
             });
@@ -168,6 +169,11 @@ function wrapper(plugin_info) {
             window.plugin.offle.updatePortalCounter();
         };
 
+        window.plugin.offle.changeSymbol = function (event) {
+            window.plugin.offle.symbol = event.target.value;
+            window.plugin.offle.renderVisiblePortals();
+        };
+
         window.plugin.offle.setupHtml = function () {
             window.plugin.offle.dialogHtml = '<div id="offle-info">' +
                 '<div>' +
@@ -177,6 +183,7 @@ function wrapper(plugin_info) {
                 '</span></div>' +
                 '<div> Visible portals:' +
                 '<span id="visible-portals-counter">x</span></div>' +
+                '<div> <input type="text" value="&bull;" size="1" onchange="window.plugin.offle.changeSymbol(event)"> </div>' +
                 '<div style="border-bottom: 60px;">' +
                 '<button onclick="window.plugin.offle.showLAWindow();return false;">New portals</button>' +
                 '</div><br/><br/><br/>' +
