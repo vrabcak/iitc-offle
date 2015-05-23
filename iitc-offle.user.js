@@ -2,7 +2,7 @@
 // @id             iitc-plugin-offle
 // @name           IITC plugin: offle
 // @category       Misc
-// @version        0.2.1
+// @version        0.2.2-a
 // @namespace      https://github.com/vrabcak/iitc-offle
 // @description    Offle
 // @include        https://www.ingress.com/intel*
@@ -54,7 +54,7 @@ function wrapper(plugin_info) {
 
         window.plugin.offle.renderPortal = function (guid, name, latLng) {
             var portalMarker, uniqueInfo,
-                iconCSSClass = 'offle-X-basic';
+                iconCSSClass = 'offle-marker';
 
             if (window.plugin.uniques) {
                 uniqueInfo = window.plugin.uniques.uniques[guid];
@@ -62,19 +62,19 @@ function wrapper(plugin_info) {
 
             if (uniqueInfo) {
                 if (uniqueInfo.visited) {
-                    iconCSSClass = 'offle-X-visited';
+                    iconCSSClass += ' offle-marker-visited-color';
                 }
                 if (uniqueInfo.captured) {
-                    iconCSSClass = 'offle-X-captured';
+                    iconCSSClass += ' offle-marker-captured-color';
                 }
             }
 
             portalMarker = L.marker(latLng, {
                 icon: L.divIcon({
                     className: iconCSSClass,
-                    iconAnchor: [5, 5],
-                    iconSize: [10, 10],
-                    html: "X"
+                    iconAnchor: [15, 23],
+                    iconSize: [30, 30],
+                    html: "&bull;"
                 }),
                 name: name
             });
@@ -99,30 +99,26 @@ function wrapper(plugin_info) {
         window.plugin.offle.setupCSS = function () {
             $("<style>")
                 .prop("type", "text/css")
-                .html('.offle-X-basic {' +
-                    'font-size: 10px;' +
+                .html('.offle-marker {' +
+                    'font-size: 30px;' +
                     'color: #FF6200;' +
                     'font-family: monospace;' +
                     'text-align: center;' +
                     'pointer-events: none;' +
                     '}' +
-                    '.offle-X-visited {' +
-                    'font-size: 10px;' +
+                    '.offle-marker-visited-color {' +
                     'color: #FFCE00;' +
-                    'font-family: monospace;' +
-                    'text-align: center;' +
-                    'pointer-events: none;' +
                     '}' +
-                    '.offle-X-captured {' +
-                    'font-size: 10px;' +
+                    '.offle-marker-captured-color {' +
                     'color: #00BB00;' +
-                    'font-family: monospace;' +
-                    'text-align: center;' +
-                    'pointer-events: none;' +
                     '}' +
                     '.offle-portal-counter {' +
                     'display: none; position: absolute; top:0; left: 40vh;' +
-                    'background-color: orange; z-index: 4002; cursor:pointer;}'
+                    'background-color: orange; z-index: 4002; cursor:pointer;}' +
+                    '.pokus {' +
+                    'border-style: solid;' +
+                    'border-width: 3px' +
+                    '}'
 
                 )
                 .appendTo("head");
