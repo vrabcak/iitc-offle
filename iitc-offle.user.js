@@ -40,10 +40,13 @@ function wrapper(plugin_info) {
 
         window.plugin.offle.addPortal = function (guid, name, latLng) {
             if (!(guid in window.plugin.offle.portalDb)) {
-                window.plugin.offle.lastAddedDb.push({
-                    name: name,
-                    latLng: latLng
-                });
+
+                if (!(window.plugin.uniques && (guid in window.plugin.uniques.uniques))) {
+                    window.plugin.offle.lastAddedDb.push({
+                        name: name,
+                        latLng: latLng
+                    });
+                }
                 window.plugin.offle.portalDb[guid] = latLng;
                 window.plugin.offle.dirtyDb = true; //mark Db dirty to by stored on mapDataRefreshEnd
                 window.plugin.offle.renderPortal(guid, name, latLng);
