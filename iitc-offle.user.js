@@ -24,40 +24,41 @@ function wrapper(plugin_info) {
 
         // use own namespace for plugin
         window.plugin.offle = function () {};
-        window.plugin.offle.portalDb = {};
-        window.plugin.offle.lastAddedDb = [];
-        window.plugin.offle.symbol = '&bull;';
-        window.plugin.offle.maxVisibleCount = 2000;
+        var offle = window.plugin.offle;
+        offle.portalDb = {};
+        offle.lastAddedDb = [];
+        offle.symbol = '&bull;';
+        offle.maxVisibleCount = 2000;
 
 
         // Use portal add event to save it to db
-        window.plugin.offle.portalAdded = function (data) {
-            window.plugin.offle.addPortal(
+        offle.portalAdded = function (data) {
+            offle.addPortal(
                 data.portal.options.guid,
                 data.portal.options.data.title,
                 data.portal.getLatLng()
             );
         };
 
-        window.plugin.offle.addPortal = function (guid, name, latLng) {
-            if (!(guid in window.plugin.offle.portalDb)) {
+        offle.addPortal = function (guid, name, latLng) {
+            if (!(guid in offle.portalDb)) {
 
                 if (!(window.plugin.uniques && (guid in window.plugin.uniques.uniques))) {
-                    window.plugin.offle.lastAddedDb.push({
+                    offle.lastAddedDb.push({
                         name: name,
                         latLng: latLng
                     });
                 }
-                window.plugin.offle.portalDb[guid] = latLng;
-                window.plugin.offle.dirtyDb = true; //mark Db dirty to by stored on mapDataRefreshEnd
-                window.plugin.offle.renderPortal(guid, name, latLng);
-                window.plugin.offle.updatePortalCounter();
-                window.plugin.offle.updateLACounter();
-                window.plugin.offle.updateLAList();
+                offle.portalDb[guid] = latLng;
+                offle.dirtyDb = true; //mark Db dirty to by stored on mapDataRefreshEnd
+                offle.renderPortal(guid, name, latLng);
+                offle.updatePortalCounter();
+                offle.updateLACounter();
+                offle.updateLAList();
             }
         };
 
-        window.plugin.offle.renderPortal = function (guid, name, latLng) {
+        offle.renderPortal = function (guid, name, latLng) {
             var portalMarker, uniqueInfo,
                 iconCSSClass = 'offle-marker';
 
@@ -79,33 +80,33 @@ function wrapper(plugin_info) {
                     className: iconCSSClass,
                     iconAnchor: [15, 23],
                     iconSize: [30, 30],
-                    html: window.plugin.offle.symbol
+                    html: offle.symbol
                 }),
                 name: name
             });
 
-            portalMarker.addTo(window.plugin.offle.portalLayerGroup);
+            portalMarker.addTo(offle.portalLayerGroup);
 
         };
 
-        window.plugin.offle.clearLayer = function () {
-            window.plugin.offle.portalLayerGroup.clearLayers();
+        offle.clearLayer = function () {
+            offle.portalLayerGroup.clearLayers();
         };
 
-        window.plugin.offle.mapDataRefreshEnd = function () {
-            if (window.plugin.offle.dirtyDb) {
+        offle.mapDataRefreshEnd = function () {
+            if (offle.dirtyDb) {
                 //console.log("Storing new portals to localStorage");
-                localStorage.setItem('portalDb', JSON.stringify(window.plugin.offle.portalDb));
+                localStorage.setItem('portalDb', JSON.stringify(offle.portalDb));
             }
-            window.plugin.offle.dirtyDb = false;
+            offle.dirtyDb = false;
         };
 
-        window.plugin.offle.setupLayer = function () {
-            window.plugin.offle.portalLayerGroup = new L.LayerGroup();
-            window.addLayerGroup('offlePortals', window.plugin.offle.portalLayerGroup, false);
+        offle.setupLayer = function () {
+            offle.portalLayerGroup = new L.LayerGroup();
+            window.addLayerGroup('offlePortals', offle.portalLayerGroup, false);
         };
 
-        window.plugin.offle.setupCSS = function () {
+        offle.setupCSS = function () {
             $("<style>")
                 .prop("type", "text/css")
                 .html('.offle-marker {' +
@@ -133,17 +134,17 @@ function wrapper(plugin_info) {
                 .appendTo("head");
         };
 
-        window.plugin.offle.updatePortalCounter = function () {
-            $('#offle-portal-counter').html(Object.keys(window.plugin.offle.portalDb).length);
+        offle.updatePortalCounter = function () {
+            $('#offle-portal-counter').html(Object.keys(offle.portalDb).length);
         };
 
 
-        window.plugin.offle.getVisiblePortals = function () {
-            var keys = Object.keys(window.plugin.offle.portalDb);
+        offle.getVisiblePortals = function () {
+            var keys = Object.keys(offle.portalDb);
             var actualBounds = map.getBounds();
             var keysInView = keys.filter(function (key) {
                 var ll,
-                    portal = window.plugin.offle.portalDb[key];
+                    portal = offle.portalDb[key];
                 if (portal.lat && portal.lng) {
                     ll = L.latLng(portal.lat, portal.lng);
                     return actualBounds.contains(ll);
@@ -155,51 +156,55 @@ function wrapper(plugin_info) {
             return keysInView;
         };
 
-        window.plugin.offle.renderVisiblePortals = function () {
-            var visiblePortalsKeys = window.plugin.offle.getVisiblePortals();
-            if (visiblePortalsKeys.length < window.plugin.offle.maxVisibleCount) {
+        offle.renderVisiblePortals = function () {
+            var visiblePortalsKeys = offle.getVisiblePortals();
+            if (visiblePortalsKeys.length < offle.maxVisibleCount) {
                 visiblePortalsKeys.forEach(function (key) {
-                    var portal = window.plugin.offle.portalDb[key],
+                    var portal = offle.portalDb[key],
                         ll = L.latLng(portal.lat, portal.lng);
-                    window.plugin.offle.renderPortal(key, '', ll);
+                    offle.renderPortal(key, '', ll);
                 });
             }
         };
 
-        window.plugin.offle.onMapMove = function () {
-            window.plugin.offle.renderVisiblePortals();
+        offle.onMapMove = function () {
+            offle.renderVisiblePortals();
         };
 
-        window.plugin.offle.clearDb = function () {
+        offle.clearDb = function () {
             localStorage.removeItem('portalDb');
-            window.plugin.offle.portalDb = {};
-            window.plugin.offle.portalLayerGroup.clearLayers();
-            window.plugin.offle.updatePortalCounter();
+            offle.portalDb = {};
+            offle.portalLayerGroup.clearLayers();
+            offle.updatePortalCounter();
         };
 
-        window.plugin.offle.changeSymbol = function (event) {
-            window.plugin.offle.symbol = event.target.value;
-            window.plugin.offle.clearLayer();
-            window.plugin.offle.renderVisiblePortals();
+        offle.changeSymbol = function (event) {
+            offle.symbol = event.target.value;
+            offle.clearLayer();
+            offle.renderVisiblePortals();
         };
 
-        window.plugin.offle.changeMaxVisibleCount = function (event) {
-            window.plugin.offle.maxVisibleCount = event.target.value;
-            window.plugin.offle.clearLayer();
-            window.plugin.offle.renderVisiblePortals();
+        offle.changeMaxVisibleCount = function (event) {
+            offle.maxVisibleCount = event.target.value;
+            offle.clearLayer();
+            offle.renderVisiblePortals();
         };
 
-        window.plugin.offle.setupHtml = function () {
-            window.plugin.offle.dialogHtml = '<div id="offle-info">' +
+        offle.setupHtml = function () {
+            offle.dialogHtml = '<div id="offle-info">' +
                 '<div>' +
                 '<div> Offline portals count:' +
                 '<span id="offle-portal-counter">' +
-                Object.keys(window.plugin.offle.portalDb).length +
+                Object.keys(offle.portalDb).length +
                 '</span></div>' +
                 '<div> Visible portals:' +
                 '<span id="visible-portals-counter">x</span></div>' +
-                '<div> Portal marker symbol: <input type="text" value="&bull;" size="1" onchange="window.plugin.offle.changeSymbol(event)"> </div>' +
-                '<div> Maximum visible portals: <input type="number" value="2000" size="5" onchange="window.plugin.offle.changeMaxVisibleCount(event)"> </div>' +
+                '<div> Portal marker symbol: <input type="text" value="' +
+                offle.symbol +
+                '" size="1" onchange="window.plugin.offle.changeSymbol(event)"> </div>' +
+                '<div> Maximum visible portals: <input type="number" value="' +
+                offle.maxVisibleCount +
+                '" size="5" onchange="window.plugin.offle.changeMaxVisibleCount(event)"> </div>' +
                 '<div style="border-bottom: 60px;">' +
                 '<button onclick="window.plugin.offle.showLAWindow();return false;">New portals</button>' +
                 '</div><br/><br/><br/>' +
@@ -208,7 +213,7 @@ function wrapper(plugin_info) {
                 '</div>';
             $('#toolbox').append('<a id="offle-show-info" onclick="window.plugin.offle.showDialog();">Offle</a> ');
 
-            window.plugin.offle.lastAddedDialogHtml = '' +
+            offle.lastAddedDialogHtml = '' +
                 '<div id="offle-last-added-list">' +
                 'placeholder <br/>' +
                 'placeholder' +
@@ -220,32 +225,32 @@ function wrapper(plugin_info) {
         };
 
 
-        window.plugin.offle.showDialog = function () {
+        offle.showDialog = function () {
             window.dialog({
-                html: window.plugin.offle.dialogHtml,
+                html: offle.dialogHtml,
                 title: 'Offle',
                 modal: false,
                 id: 'offle-info'
             });
-            window.plugin.offle.updatePortalCounter();
-            window.plugin.offle.getVisiblePortals();
+            offle.updatePortalCounter();
+            offle.getVisiblePortals();
         };
 
-        window.plugin.offle.showLAWindow = function () {
+        offle.showLAWindow = function () {
 
             window.dialog({
-                html: window.plugin.offle.lastAddedDialogHtml,
+                html: offle.lastAddedDialogHtml,
                 title: 'Portals added since last session:',
                 modal: false,
                 id: 'offle-LA',
                 height: $(window).height() * 0.45
             });
-            window.plugin.offle.updateLAList();
+            offle.updateLAList();
 
         };
 
-        window.plugin.offle.updateLAList = function () { /// update list of last added portals
-            var portalListHtml = window.plugin.offle.lastAddedDb.map(function (portal) {
+        offle.updateLAList = function () { /// update list of last added portals
+            var portalListHtml = offle.lastAddedDb.map(function (portal) {
                 var lat = portal.latLng.lat,
                     lng = portal.latLng.lng;
                 return '<a onclick="window.selectPortalByLatLng(' + lat + ', ' + lng + ');return false"' +
@@ -254,38 +259,38 @@ function wrapper(plugin_info) {
             $('#offle-last-added-list').html(portalListHtml);
         };
 
-        window.plugin.offle.updateLACounter = function () {
-            var count = window.plugin.offle.lastAddedDb.length;
+        offle.updateLACounter = function () {
+            var count = offle.lastAddedDb.length;
             if (count > 0) {
                 $('.offle-portal-counter').css('display', 'block').html('' + count);
             }
 
         };
 
-        window.plugin.offle.clearLADb = function () {
-            window.plugin.offle.lastAddedDb = [];
-            window.plugin.offle.updateLAList();
+        offle.clearLADb = function () {
+            offle.lastAddedDb = [];
+            offle.updateLAList();
             $('.offle-portal-counter').css('display', 'none');
         };
 
         var setup = function () {
-            var portalDb = window.plugin.offle.portalDb = JSON.parse(localStorage.getItem('portalDb')) || {};
-            window.plugin.offle.setupLayer();
-            window.plugin.offle.setupCSS();
-            window.plugin.offle.setupHtml();
+            var portalDb = offle.portalDb = JSON.parse(localStorage.getItem('portalDb')) || {};
+            offle.setupLayer();
+            offle.setupCSS();
+            offle.setupHtml();
 
             if (Object.keys(portalDb).length > 0) {
-                window.plugin.offle.renderVisiblePortals();
+                offle.renderVisiblePortals();
             } else {
-                window.plugin.offle.portalDb = {};
+                offle.portalDb = {};
             }
 
             map.on('movestart', function () {
-                window.plugin.offle.portalLayerGroup.clearLayers();
+                offle.portalLayerGroup.clearLayers();
             });
-            map.on('moveend', window.plugin.offle.onMapMove);
-            window.addHook('portalAdded', window.plugin.offle.portalAdded);
-            window.addHook('mapDataRefreshEnd', window.plugin.offle.mapDataRefreshEnd);
+            map.on('moveend', offle.onMapMove);
+            window.addHook('portalAdded', offle.portalAdded);
+            window.addHook('mapDataRefreshEnd', offle.mapDataRefreshEnd);
         };
         // PLUGIN END //////////////////////////////////////////////////////////
 
