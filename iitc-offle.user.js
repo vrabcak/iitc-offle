@@ -191,6 +191,22 @@ function wrapper(plugin_info) {
         };
 
         offle.setupHtml = function () {
+
+            $('#toolbox').append('<a id="offle-show-info" onclick="window.plugin.offle.showDialog();">Offle</a> ');
+
+            offle.lastAddedDialogHtml = '' +
+                '<div id="offle-last-added-list">' +
+                'placeholder <br/>' +
+                'placeholder' +
+                '</div>' +
+                '<button onclick="window.plugin.offle.clearLADb()">Clear</div>';
+
+            $('body').append('<div class="offle-portal-counter" onclick="window.plugin.offle.showLAWindow();">0</div>');
+
+        };
+
+
+        offle.showDialog = function () {
             offle.dialogHtml = '<div id="offle-info">' +
                 '<div>' +
                 '<div> Offline portals count:' +
@@ -211,21 +227,7 @@ function wrapper(plugin_info) {
                 '<button onclick="window.plugin.offle.clearDb();return false;" style="font-size: 5px;">' +
                 'Clear all offline portals</button>' +
                 '</div>';
-            $('#toolbox').append('<a id="offle-show-info" onclick="window.plugin.offle.showDialog();">Offle</a> ');
 
-            offle.lastAddedDialogHtml = '' +
-                '<div id="offle-last-added-list">' +
-                'placeholder <br/>' +
-                'placeholder' +
-                '</div>' +
-                '<button onclick="window.plugin.offle.clearLADb()">Clear</div>';
-
-            $('body').append('<div class="offle-portal-counter" onclick="window.plugin.offle.showLAWindow();">0</div>');
-
-        };
-
-
-        offle.showDialog = function () {
             window.dialog({
                 html: offle.dialogHtml,
                 title: 'Offle',
