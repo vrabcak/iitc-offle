@@ -27,6 +27,7 @@ function wrapper(plugin_info) {
         window.plugin.offle.portalDb = {};
         window.plugin.offle.lastAddedDb = [];
         window.plugin.offle.symbol = '&bull;';
+        window.plugin.offle.maxVisibleCount = 2000;
 
 
         // Use portal add event to save it to db
@@ -85,6 +86,10 @@ function wrapper(plugin_info) {
 
             portalMarker.addTo(window.plugin.offle.portalLayerGroup);
 
+        };
+
+        window.plugin.offle.clearLayer = function () {
+            window.plugin.offle.portalLayerGroup.clearLayers();
         };
 
         window.plugin.offle.mapDataRefreshEnd = function () {
@@ -152,7 +157,7 @@ function wrapper(plugin_info) {
 
         window.plugin.offle.renderVisiblePortals = function () {
             var visiblePortalsKeys = window.plugin.offle.getVisiblePortals();
-            if (visiblePortalsKeys.length < 2000) {
+            if (visiblePortalsKeys.length < window.plugin.offle.maxVisibleCount) {
                 visiblePortalsKeys.forEach(function (key) {
                     var portal = window.plugin.offle.portalDb[key],
                         ll = L.latLng(portal.lat, portal.lng);
@@ -174,6 +179,13 @@ function wrapper(plugin_info) {
 
         window.plugin.offle.changeSymbol = function (event) {
             window.plugin.offle.symbol = event.target.value;
+            window.plugin.offle.clearLayer();
+            window.plugin.offle.renderVisiblePortals();
+        };
+
+        window.plugin.offle.changeMaxVisibleCount = function (event) {
+            window.plugin.offle.maxVisibleCount = event.target.value;
+            window.plugin.offle.clearLayer();
             window.plugin.offle.renderVisiblePortals();
         };
 
@@ -186,7 +198,8 @@ function wrapper(plugin_info) {
                 '</span></div>' +
                 '<div> Visible portals:' +
                 '<span id="visible-portals-counter">x</span></div>' +
-                '<div> <input type="text" value="&bull;" size="1" onchange="window.plugin.offle.changeSymbol(event)"> </div>' +
+                '<div> Portal marker symbol: <input type="text" value="&bull;" size="1" onchange="window.plugin.offle.changeSymbol(event)"> </div>' +
+                '<div> Maximum visible portals: <input type="number" value="2000" size="5" onchange="window.plugin.offle.changeMaxVisibleCount(event)"> </div>' +
                 '<div style="border-bottom: 60px;">' +
                 '<button onclick="window.plugin.offle.showLAWindow();return false;">New portals</button>' +
                 '</div><br/><br/><br/>' +
