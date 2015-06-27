@@ -40,6 +40,12 @@ function wrapper(plugin_info) {
             );
         };
 
+        // Always update portal data if displayed in sidebar (to handle e.g. moved portals)
+        offle.portalDetailsUpdated = function (data) {
+            offle.portalDb[data.portal.options.guid] = data.portal.getLatLng();
+            localStorage.setItem('portalDb', JSON.stringify(offle.portalDb));
+        };
+
         offle.addPortal = function (guid, name, latLng) {
             if (!(guid in offle.portalDb)) {
 
@@ -293,6 +299,7 @@ function wrapper(plugin_info) {
             map.on('moveend', offle.onMapMove);
             window.addHook('portalAdded', offle.portalAdded);
             window.addHook('mapDataRefreshEnd', offle.mapDataRefreshEnd);
+            window.addHook('portalDetailsUpdated', offle.portalDetailsUpdated);
         };
         // PLUGIN END //////////////////////////////////////////////////////////
 
