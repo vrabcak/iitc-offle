@@ -45,6 +45,7 @@ function wrapper(plugin_info) {
             var guid = data.portal.options.guid;
             offle.portalDb[guid] = data.portal.getLatLng();
             offle.portalDb[guid].name = data.portal.options.data.title;
+            offle.renderVisiblePortals();
             localStorage.setItem('portalDb', JSON.stringify(offle.portalDb));
         };
 
