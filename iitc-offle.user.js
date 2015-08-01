@@ -2,7 +2,7 @@
 // @id             iitc-plugin-offle
 // @name           IITC plugin: offle
 // @category       Misc
-// @version        0.2.5
+// @version        0.3.0-a
 // @namespace      https://github.com/vrabcak/iitc-offle
 // @description    Offle
 // @include        https://www.ingress.com/intel*
@@ -28,6 +28,7 @@ function wrapper(plugin_info) {
         offle.portalDb = {};
         offle.lastAddedDb = {};
         offle.symbol = '&bull;';
+        offle.symbolWithMission = '◉';
         offle.maxVisibleCount = 2000;
 
 
@@ -36,7 +37,8 @@ function wrapper(plugin_info) {
             offle.addPortal(
                 data.portal.options.guid,
                 data.portal.options.data.title,
-                data.portal.getLatLng()
+                data.portal.getLatLng(),
+                data.portal.options.data.mission
             );
         };
 
@@ -45,12 +47,13 @@ function wrapper(plugin_info) {
             var guid = data.portal.options.guid;
             offle.portalDb[guid] = data.portal.getLatLng();
             offle.portalDb[guid].name = data.portal.options.data.title;
+            offle.portalDb[guid].mission = data.portal.options.data.mission;
             offle.renderVisiblePortals();
             localStorage.setItem('portalDb', JSON.stringify(offle.portalDb));
         };
 
 
-        offle.addPortal = function (guid, name, latLng) {
+        offle.addPortal = function (guid, name, latLng, mission) {
             if (guid && !(guid in offle.portalDb) ||
                 (name && !offle.portalDb[guid].name)) {
 
@@ -65,15 +68,16 @@ function wrapper(plugin_info) {
 
                 offle.portalDb[guid] = latLng;
                 offle.portalDb[guid].name = name;
+                offle.portalDb[guid].mission = mission;
                 offle.dirtyDb = true; //mark Db dirty to by stored on mapDataRefreshEnd
-                offle.renderPortal(guid, name, latLng);
+                offle.renderPortal(guid);
                 offle.updatePortalCounter();
                 offle.updateLACounter();
                 offle.updateLAList();
             }
         };
 
-        offle.renderPortal = function (guid, name, latLng) {
+        offle.renderPortal = function (guid) {
             var portalMarker, uniqueInfo,
                 iconCSSClass = 'offle-marker';
 
@@ -90,15 +94,15 @@ function wrapper(plugin_info) {
                 }
             }
 
-            portalMarker = L.marker(latLng, {
+            portalMarker = L.marker(offle.portalDb[guid], {
                 icon: L.divIcon({
                     className: iconCSSClass,
                     iconAnchor: [15, 23],
                     iconSize: [30, 30],
-                    html: offle.symbol
+                    html: offle.portalDb[guid].mission ? offle.symbolWithMission : offle.symbol
                 }),
-                name: name,
-                title: name
+                name: offle.portalDb[guid].name,
+                title: offle.portalDb[guid].name || ''
             });
 
             //clickthrough workaround - hide topmost element and propagate click down to the lower layer
@@ -188,9 +192,7 @@ function wrapper(plugin_info) {
             var visiblePortalsKeys = offle.getVisiblePortals();
             if (visiblePortalsKeys.length < offle.maxVisibleCount) {
                 visiblePortalsKeys.forEach(function (key) {
-                    var portal = offle.portalDb[key],
-                        ll = L.latLng(portal.lat, portal.lng);
-                    offle.renderPortal(key, portal.name || '', ll);
+                    offle.renderPortal(key);
                 });
             }
         };
