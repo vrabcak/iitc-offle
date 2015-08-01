@@ -26,7 +26,7 @@ function wrapper(plugin_info) {
         window.plugin.offle = function () {};
         var offle = window.plugin.offle;
         offle.portalDb = {};
-        offle.lastAddedDb = [];
+        offle.lastAddedDb = {};
         offle.symbol = '&bull;';
         offle.maxVisibleCount = 2000;
 
@@ -54,10 +54,10 @@ function wrapper(plugin_info) {
             if (guid && !(guid in offle.portalDb) || !offle.portalDb[guid].name) {
 
                 if (!(window.plugin.uniques && (guid in window.plugin.uniques.uniques))) {
-                    offle.lastAddedDb.push({
+                    offle.lastAddedDb[guid] = {
                         name: name || guid,
                         latLng: latLng
-                    });
+                    };
                 }
                 offle.portalDb[guid] = latLng;
                 offle.portalDb[guid].name = name;
@@ -276,7 +276,9 @@ function wrapper(plugin_info) {
         };
 
         offle.updateLAList = function () { /// update list of last added portals
-            var portalListHtml = offle.lastAddedDb.map(function (portal) {
+            var guids = Object.keys(offle.lastAddedDb);
+            var portalListHtml = guids.map(function (guid) {
+                var portal = offle.lastAddedDb[guid];
                 var lat = portal.latLng.lat,
                     lng = portal.latLng.lng;
                 return '<a onclick="window.selectPortalByLatLng(' + lat + ', ' + lng + ');return false"' +
@@ -286,7 +288,7 @@ function wrapper(plugin_info) {
         };
 
         offle.updateLACounter = function () {
-            var count = offle.lastAddedDb.length;
+            var count = Object.keys(offle.lastAddedDb).length;
             if (count > 0) {
                 $('.offle-portal-counter').css('display', 'block').html('' + count);
             }
@@ -294,7 +296,7 @@ function wrapper(plugin_info) {
         };
 
         offle.clearLADb = function () {
-            offle.lastAddedDb = [];
+            offle.lastAddedDb = {};
             offle.updateLAList();
             $('.offle-portal-counter').css('display', 'none');
         };
