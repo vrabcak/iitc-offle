@@ -2,7 +2,7 @@
 // @id             iitc-plugin-offle
 // @name           IITC plugin: offle
 // @category       Misc
-// @version        0.2.4
+// @version        0.2.5
 // @namespace      https://github.com/vrabcak/iitc-offle
 // @description    Offle
 // @include        https://www.ingress.com/intel*
@@ -51,7 +51,8 @@ function wrapper(plugin_info) {
 
 
         offle.addPortal = function (guid, name, latLng) {
-            if (guid && !(guid in offle.portalDb) || !offle.portalDb[guid].name) {
+            if (guid && !(guid in offle.portalDb) ||
+                (name && !offle.portalDb[guid].name)) {
 
                 offle.lastAddedDb[guid] = {
                     name: name || guid,
