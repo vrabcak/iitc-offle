@@ -2,7 +2,7 @@
 // @id             iitc-plugin-offle
 // @name           IITC plugin: offle
 // @category       Misc
-// @version        0.2.3
+// @version        0.2.4
 // @namespace      https://github.com/vrabcak/iitc-offle
 // @description    Offle
 // @include        https://www.ingress.com/intel*
@@ -53,12 +53,15 @@ function wrapper(plugin_info) {
         offle.addPortal = function (guid, name, latLng) {
             if (guid && !(guid in offle.portalDb) || !offle.portalDb[guid].name) {
 
+                offle.lastAddedDb[guid] = {
+                    name: name || guid,
+                    latLng: latLng,
+                    unique: false
+                };
                 if (!(window.plugin.uniques && (guid in window.plugin.uniques.uniques))) {
-                    offle.lastAddedDb[guid] = {
-                        name: name || guid,
-                        latLng: latLng
-                    };
+                    offle.lastAddedDb[guid].unique = true;
                 }
+
                 offle.portalDb[guid] = latLng;
                 offle.portalDb[guid].name = name;
                 offle.dirtyDb = true; //mark Db dirty to by stored on mapDataRefreshEnd
@@ -282,6 +285,7 @@ function wrapper(plugin_info) {
                 var lat = portal.latLng.lat,
                     lng = portal.latLng.lng;
                 return '<a onclick="window.selectPortalByLatLng(' + lat + ', ' + lng + ');return false"' +
+                    (portal.unique ? 'style="color: #FF6200;"' : '') +
                     'href="/intel?pll=' + portal.latLng.lat + ',' + portal.latLng.lng + '">' + portal.name + '</a>';
             }).join('<br />');
             $('#offle-last-added-list').html(portalListHtml);
