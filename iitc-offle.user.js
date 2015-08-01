@@ -49,8 +49,9 @@ function wrapper(plugin_info) {
             localStorage.setItem('portalDb', JSON.stringify(offle.portalDb));
         };
 
+
         offle.addPortal = function (guid, name, latLng) {
-            if (guid && !(guid in offle.portalDb)) {
+            if (guid && !(guid in offle.portalDb) || !offle.portalDb[guid].name) {
 
                 if (!(window.plugin.uniques && (guid in window.plugin.uniques.uniques))) {
                     offle.lastAddedDb.push({
@@ -98,14 +99,14 @@ function wrapper(plugin_info) {
 
             //clickthrough workaround - hide topmost element and propagate click down to the lower layer
             portalMarker.on('click', function (e) {
-                 var screenX = e.originalEvent.pageX,
-                     screenY = e.originalEvent.pageY,
-                     origEl = document.elementFromPoint(screenX, screenY),
-                     origElDisplayStyle = origEl.style.display,
-                     newEvent = new MouseEvent(e.originalEvent.type, e.originalEvent);
-                 origEl.style.display = "none";
-                 document.elementFromPoint(screenX, screenY).dispatchEvent(newEvent);
-                 origEl.style.display = origElDisplayStyle;
+                var screenX = e.originalEvent.pageX,
+                    screenY = e.originalEvent.pageY,
+                    origEl = document.elementFromPoint(screenX, screenY),
+                    origElDisplayStyle = origEl.style.display,
+                    newEvent = new MouseEvent(e.originalEvent.type, e.originalEvent);
+                origEl.style.display = "none";
+                document.elementFromPoint(screenX, screenY).dispatchEvent(newEvent);
+                origEl.style.display = origElDisplayStyle;
             });
 
             portalMarker.addTo(offle.portalLayerGroup);
