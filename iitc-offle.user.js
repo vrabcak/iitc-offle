@@ -245,6 +245,9 @@ function wrapper(plugin_info) {
             '</span></div>' +
             '<div> Visible portals:' +
             '<span id="visible-portals-counter">x</span></div>' +
+            '<div> Unique portals visited: ' +
+            (window.plugin.uniques ? Object.keys(window.plugin.uniques.uniques).length : 'uniques plugin missing') +
+            '</div>' +
             '<div> Portal marker symbol: <input type="text" value="' +
             offle.symbol +
             '" size="1" onchange="window.plugin.offle.changeSymbol(event)"> </div>' +
