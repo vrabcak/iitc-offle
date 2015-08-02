@@ -44,19 +44,21 @@ function wrapper(plugin_info) {
 
     // Always update portal data if displayed in sidebar (to handle e.g. moved portals)
     offle.portalDetailsUpdated = function (data) {
-        var guid = data.portal.options.guid;
-        offle.portalDb[guid] = data.portal.getLatLng();
-        offle.portalDb[guid].name = data.portal.options.data.title;
-        offle.portalDb[guid].mission = data.portal.options.data.mission;
-        offle.renderVisiblePortals();
-        localStorage.setItem('portalDb', JSON.stringify(offle.portalDb));
+        var guid = data.portal.options.guid,
+            name = data.portal.options.data.title;
+        if (name) { //update data only with portals with full details
+            offle.portalDb[guid] = data.portal.getLatLng();
+            offle.portalDb[guid].name = data.portal.options.data.title;
+            offle.portalDb[guid].mission = data.portal.options.data.mission;
+            offle.renderVisiblePortals();
+            localStorage.setItem('portalDb', JSON.stringify(offle.portalDb));
+        }
     };
 
 
     offle.addPortal = function (guid, name, latLng, mission) {
-        if (guid && !(guid in offle.portalDb) ||
+        if ((guid && !(guid in offle.portalDb)) ||
             (name && !offle.portalDb[guid].name)) {
-
             offle.lastAddedDb[guid] = {
                 name: name || guid,
                 latLng: latLng,
