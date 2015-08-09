@@ -57,13 +57,20 @@ function wrapper(plugin_info) {
 
 
     offle.addPortal = function (guid, name, latLng, mission) {
-        if ((guid && !(guid in offle.portalDb)) ||
-            (name && !offle.portalDb[guid].name)) {
-            offle.lastAddedDb[guid] = {
-                name: name || guid,
-                latLng: latLng,
-                unique: false
-            };
+        var notInDb = guid && !(guid in offle.portalDb);
+        var newName = name && !offle.portalDb[guid].name;
+
+        if (notInDb || newName) {
+
+            //add to last added list only new portals or update already displayed guid with name
+            if (notInDb || (newName && (guid in offle.lastAddedDb))) {
+                offle.lastAddedDb[guid] = {
+                    name: name || guid,
+                    latLng: latLng,
+                    unique: false
+                };
+            }
+
             if (!(window.plugin.uniques && (guid in window.plugin.uniques.uniques))) {
                 offle.lastAddedDb[guid].unique = true;
             }
