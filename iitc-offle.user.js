@@ -2,7 +2,7 @@
 // @id             iitc-plugin-offle
 // @name           IITC plugin: offle
 // @category       Misc
-// @version        0.3.2
+// @version        0.3.3
 // @namespace      https://github.com/vrabcak/iitc-offle
 // @description    Offle
 // @include        https://www.ingress.com/intel*
@@ -28,7 +28,7 @@ function wrapper(plugin_info) {
     offle.portalDb = {};
     offle.lastAddedDb = {};
     offle.symbol = '&bull;';
-    offle.symbolWithMission = '✪';
+    offle.symbolWithMission = '◉';
     offle.maxVisibleCount = 2000;
 
 
@@ -293,8 +293,9 @@ function wrapper(plugin_info) {
         var portalListHtml = guids.map(function (guid) {
             var portal = offle.lastAddedDb[guid];
             var lat = portal.latLng.lat,
-                lng = portal.latLng.lng;
-            return '<a onclick="window.selectPortalByLatLng(' + lat + ', ' + lng + ');return false"' +
+                lng = portal.latLng.lng,
+                urlPortalLL = [lat,lng];
+            return '<a onclick="urlPortalLL=['+urlPortalLL+'];map.setView(urlPortalLL, 17);return false"' +
                 (portal.unique ? 'style="color: #FF6200;"' : '') +
                 'href="/intel?pll=' + portal.latLng.lat + ',' + portal.latLng.lng + '">' + portal.name + '</a>';
         }).join('<br />');
