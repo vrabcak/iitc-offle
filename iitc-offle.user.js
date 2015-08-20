@@ -2,7 +2,7 @@
 // @id             iitc-plugin-offle
 // @name           IITC plugin: offle
 // @category       Misc
-// @version        0.3.1
+// @version        0.3.2
 // @namespace      https://github.com/vrabcak/iitc-offle
 // @description    Offle
 // @include        https://www.ingress.com/intel*
@@ -117,16 +117,9 @@ function wrapper(plugin_info) {
             title: offle.portalDb[guid].name || ''
         });
 
-        //clickthrough workaround - hide topmost element and propagate click down to the lower layer
         portalMarker.on('click', function (e) {
-            var screenX = e.originalEvent.pageX,
-                screenY = e.originalEvent.pageY,
-                origEl = document.elementFromPoint(screenX, screenY),
-                origElDisplayStyle = origEl.style.display,
-                newEvent = new MouseEvent(e.originalEvent.type, e.originalEvent);
-            origEl.style.display = "none";
-            document.elementFromPoint(screenX, screenY).dispatchEvent(newEvent);
-            origEl.style.display = origElDisplayStyle;
+            var ll = offle.portalDb[guid];
+            window.selectPortalByLatLng(ll.lat, ll.lng);
         });
 
         portalMarker.addTo(offle.portalLayerGroup);
