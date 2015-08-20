@@ -28,7 +28,7 @@ function wrapper(plugin_info) {
     offle.portalDb = {};
     offle.lastAddedDb = {};
     offle.symbol = '&bull;';
-    offle.symbolWithMission = '◉';
+    offle.symbolWithMission = '✪';
     offle.maxVisibleCount = 2000;
 
 
@@ -72,10 +72,10 @@ function wrapper(plugin_info) {
                     latLng: latLng,
                     unique: false
                 };
-            }
 
-            if (!(window.plugin.uniques && (guid in window.plugin.uniques.uniques))) {
+                if (!(window.plugin.uniques && (guid in window.plugin.uniques.uniques))) {
                 offle.lastAddedDb[guid].unique = true;
+                }
             }
 
             offle.portalDb[guid] = latLng;
@@ -118,8 +118,7 @@ function wrapper(plugin_info) {
         });
 
         portalMarker.on('click', function (e) {
-            var ll = offle.portalDb[guid];
-            window.selectPortalByLatLng(ll.lat, ll.lng);
+            window.renderPortalDetails(guid);
         });
 
         portalMarker.addTo(offle.portalLayerGroup);
