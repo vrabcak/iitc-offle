@@ -2,7 +2,7 @@
 // @id             iitc-plugin-offle
 // @name           IITC plugin: offle
 // @category       Misc
-// @version        0.3.3
+// @version        0.3.4
 // @namespace      https://github.com/vrabcak/iitc-offle
 // @description    Offle
 // @include        https://www.ingress.com/intel*
@@ -117,7 +117,7 @@ function wrapper(plugin_info) {
             title: offle.portalDb[guid].name || ''
         });
 
-        portalMarker.on('click', function (e) {
+        portalMarker.on('click', function () {
             window.renderPortalDetails(guid);
         });
 
@@ -275,6 +275,14 @@ function wrapper(plugin_info) {
         offle.getVisiblePortals();
     };
 
+    offle.zoomToPortalAndShow = function (guid) {
+       var lat = offle.portalDb[guid].lat,
+           lng = offle.portalDb[guid].lng,
+           ll = [lat,lng];
+       map.setView (ll, 17);
+       window.renderPortalDetails(guid);
+    };
+
     offle.showLAWindow = function () {
 
         window.dialog({
@@ -292,10 +300,7 @@ function wrapper(plugin_info) {
         var guids = Object.keys(offle.lastAddedDb);
         var portalListHtml = guids.map(function (guid) {
             var portal = offle.lastAddedDb[guid];
-            var lat = portal.latLng.lat,
-                lng = portal.latLng.lng,
-                urlPortalLL = [lat,lng];
-            return '<a onclick="urlPortalLL=['+urlPortalLL+'];map.setView(urlPortalLL, 17);return false"' +
+            return '<a onclick="window.plugin.offle.zoomToPortalAndShow(\''+guid+'\');return false"' +
                 (portal.unique ? 'style="color: #FF6200;"' : '') +
                 'href="/intel?pll=' + portal.latLng.lat + ',' + portal.latLng.lng + '">' + portal.name + '</a>';
         }).join('<br />');
