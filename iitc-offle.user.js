@@ -279,7 +279,7 @@ function wrapper(plugin_info) {
        var lat = offle.portalDb[guid].lat,
            lng = offle.portalDb[guid].lng,
            ll = [lat,lng];
-       map.setView (ll, 17);
+       map.setView (ll, 14);
        window.renderPortalDetails(guid);
     };
 
