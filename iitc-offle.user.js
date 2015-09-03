@@ -260,6 +260,8 @@ function wrapper(plugin_info) {
             '" size="5" onchange="window.plugin.offle.changeMaxVisibleCount(event)"> </div>' +
             '<div style="border-bottom: 60px;">' +
             '<button onclick="window.plugin.offle.showLAWindow();return false;">New portals</button>' +
+            '<button onClick="window.plugin.offle.export();return false;">Export</button>' +
+            '<button onClick="window.plugin.offle.import();return false;">Import</button>' +
             '</div><br/><br/><br/>' +
             '<button onclick="window.plugin.offle.clearDb();return false;" style="font-size: 5px;">' +
             'Clear all offline portals</button>' +
@@ -320,6 +322,51 @@ function wrapper(plugin_info) {
         offle.updateLAList();
         $('.offle-portal-counter').css('display', 'none');
     };
+
+    offle.export = function()
+    {
+        var out = JSON.stringify(offle.portalDb);
+        var html = "<p><a onclick=\"document.getElementById(&quot;offleexport&quot;).select();\">Select all</a> and press CTRL+C to copy it.</p>" +
+            "<textarea readonly id=\"offleexport\" onclick=\"document.getElementById(&quot;offleexport&quot;).select();\" style=\"width:96%; height:250px; resize:vertical;\">" +
+            out + "</textarea>";
+        dialog({html:html, width:600, title:"Offle export"});
+    };
+
+    offle.import = function()
+    {
+        // (?:[a-f]|\d){32}\.\d{2}
+        var re = "/(?:[a-f]|\d){32}\.\d{2}/";
+        var is_guid = function(guid){
+            //return guid.search(re) !== -1;
+            //return guid.match(re) !== null;
+            //return true;
+        }
+        var string_db = prompt("Please paste exported DB from clipboard:", "");
+        if(string_db != null){
+            debugger;
+            var portal_db = JSON.parse(string_db);
+            var guids = Object.keys(portal_db);
+            var len = guids.length;
+            var old_len = Object.keys(offle.portalDb).length;
+            for(i = 0; i != len; ++i){
+                var guid = guids[i];
+                //if(!is_guid(guid)){
+                //    continue;
+                //}
+                var obj = portal_db[guid];
+                //if(!obj.hasOwnProperty("lat") || !obj.hasOwnProperty("lng") || !obj.hasOwnProperty("name") || !obj.hasOwnProperty("mission")){
+                //    continue;
+                //}
+                offle.portalDb[guid] = {"lat":obj.lat,"lng":obj.lng};
+                offle.portalDb[guid].name = obj.name;
+                offle.portalDb[guid].mission = obj.mission;
+            }
+            var new_len = Object.keys(offle.portalDb).length;
+            offle.dirtyDb = true;
+            window.alert("Portals processed: " + len + ", portals added:" + (new_len - old_len) + ".");
+            offle.renderVisiblePortals();
+        }
+    }
 
     var setup = function () {
         var portalDb = offle.portalDb = JSON.parse(localStorage.getItem('portalDb')) || {};
