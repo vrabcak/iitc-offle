@@ -2,7 +2,7 @@
 // @id             iitc-plugin-offle
 // @name           IITC plugin: offle
 // @category       Misc
-// @version        0.4.0
+// @version        0.4.1
 // @namespace      https://github.com/vrabcak/iitc-offle
 // @description    Offle
 // @include        https://www.ingress.com/intel*
@@ -74,7 +74,7 @@ function wrapper(plugin_info) {
                 };
 
                 if (!(window.plugin.uniques && (guid in window.plugin.uniques.uniques))) {
-                offle.lastAddedDb[guid].unique = true;
+                    offle.lastAddedDb[guid].unique = true;
                 }
             }
 
@@ -144,30 +144,30 @@ function wrapper(plugin_info) {
 
     offle.setupCSS = function () {
         $("<style>")
-            .prop("type", "text/css")
-            .html('.offle-marker {' +
-                'font-size: 30px;' +
-                'color: #FF6200;' +
-                'font-family: monospace;' +
-                'text-align: center;' +
-                //'pointer-events: none;' +
-                '}' +
-                '.offle-marker-visited-color {' +
-                'color: #FFCE00;' +
-                '}' +
-                '.offle-marker-captured-color {' +
-                'color: #00BB00;' +
-                '}' +
-                '.offle-portal-counter {' +
-                'display: none; position: absolute; top:0; left: 40vh;' +
-                'background-color: orange; z-index: 4002; cursor:pointer;}' +
-                '.pokus {' +
-                'border-style: solid;' +
-                'border-width: 3px' +
-                '}'
+        .prop("type", "text/css")
+        .html('.offle-marker {' +
+              'font-size: 30px;' +
+              'color: #FF6200;' +
+              'font-family: monospace;' +
+              'text-align: center;' +
+              //'pointer-events: none;' +
+              '}' +
+              '.offle-marker-visited-color {' +
+              'color: #FFCE00;' +
+              '}' +
+              '.offle-marker-captured-color {' +
+              'color: #00BB00;' +
+              '}' +
+              '.offle-portal-counter {' +
+              'display: none; position: absolute; top:0; left: 40vh;' +
+              'background-color: orange; z-index: 4002; cursor:pointer;}' +
+              '.pokus {' +
+              'border-style: solid;' +
+              'border-width: 3px' +
+              '}'
 
-            )
-            .appendTo("head");
+             )
+        .appendTo("head");
     };
 
     offle.updatePortalCounter = function () {
@@ -206,10 +206,14 @@ function wrapper(plugin_info) {
     };
 
     offle.clearDb = function () {
-        localStorage.removeItem('portalDb');
-        offle.portalDb = {};
-        offle.portalLayerGroup.clearLayers();
-        offle.updatePortalCounter();
+
+        if (confirm("Are you sure to permanently delete ALL the stored portals?")) {
+            localStorage.removeItem('portalDb');
+            offle.portalDb = {};
+            offle.portalLayerGroup.clearLayers();
+            offle.updatePortalCounter();
+        }
+
     };
 
     offle.changeSymbol = function (event) {
@@ -278,11 +282,11 @@ function wrapper(plugin_info) {
     };
 
     offle.zoomToPortalAndShow = function (guid) {
-       var lat = offle.portalDb[guid].lat,
-           lng = offle.portalDb[guid].lng,
-           ll = [lat,lng];
-       map.setView (ll, 14);
-       window.renderPortalDetails(guid);
+        var lat = offle.portalDb[guid].lat,
+            lng = offle.portalDb[guid].lng,
+            ll = [lat,lng];
+        map.setView (ll, 14);
+        window.renderPortalDetails(guid);
     };
 
     offle.showLAWindow = function () {
