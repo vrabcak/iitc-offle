@@ -2,7 +2,7 @@
 // @id             iitc-plugin-offle
 // @name           IITC plugin: offle
 // @category       Misc
-// @version        0.4.1
+// @version        0.5.0
 // @namespace      https://github.com/vrabcak/iitc-offle
 // @description    Offle
 // @include        https://www.ingress.com/intel*
@@ -123,11 +123,29 @@ function wrapper(plugin_info) {
 
         portalMarker.addTo(offle.portalLayerGroup);
 
+        if (plugin.keys) {
+            var keyCount = plugin.keys.keys[guid];
+            if (keyCount > 0) {
+                var keyMarker = L.marker(offle.portalDb[guid], {
+                    icon: L.divIcon({
+                        className: 'offle-key',
+                        iconAnchor: [6, 7],
+                        iconSize: [12, 10],
+                        html: keyCount
+                    }),
+                    guid: guid
+                });
+                keyMarker.addTo(offle.keyLayerGroup);
+            }
+        }
+
     };
 
     offle.clearLayer = function () {
         offle.portalLayerGroup.clearLayers();
+        offle.keyLayerGroup.clearLayers();
     };
+
 
     offle.mapDataRefreshEnd = function () {
         if (offle.dirtyDb) {
@@ -140,34 +158,44 @@ function wrapper(plugin_info) {
     offle.setupLayer = function () {
         offle.portalLayerGroup = new L.LayerGroup();
         window.addLayerGroup('offlePortals', offle.portalLayerGroup, false);
+        offle.keyLayerGroup = new L.LayerGroup();
+        window.addLayerGroup('offleKeys', offle.keyLayerGroup, false);
     };
 
     offle.setupCSS = function () {
         $("<style>")
-        .prop("type", "text/css")
-        .html('.offle-marker {' +
-              'font-size: 30px;' +
-              'color: #FF6200;' +
-              'font-family: monospace;' +
-              'text-align: center;' +
-              //'pointer-events: none;' +
-              '}' +
-              '.offle-marker-visited-color {' +
-              'color: #FFCE00;' +
-              '}' +
-              '.offle-marker-captured-color {' +
-              'color: #00BB00;' +
-              '}' +
-              '.offle-portal-counter {' +
-              'display: none; position: absolute; top:0; left: 40vh;' +
-              'background-color: orange; z-index: 4002; cursor:pointer;}' +
-              '.pokus {' +
-              'border-style: solid;' +
-              'border-width: 3px' +
-              '}'
-
-             )
-        .appendTo("head");
+            .prop("type", "text/css")
+            .html('.offle-marker {' +
+                'font-size: 30px;' +
+                'color: #FF6200;' +
+                'font-family: monospace;' +
+                'text-align: center;' +
+                //'pointer-events: none;' +
+                '}' +
+                '.offle-marker-visited-color {' +
+                'color: #FFCE00;' +
+                '}' +
+                '.offle-marker-captured-color {' +
+                'color: #00BB00;' +
+                '}' +
+                '.offle-portal-counter {' +
+                'display: none; position: absolute; top:0; left: 40vh;' +
+                'background-color: orange; z-index: 4002; cursor:pointer;}' +
+                '.pokus {' +
+                'border-style: solid;' +
+                'border-width: 3px' +
+                '}' +
+                '.offle-key {' +
+                'font-size: 10px;' +
+                'color: #FFFFBB;' +
+                'font-family: monospace;' +
+                'text-align: center;' +
+                'text-shadow: 0 0 0.5em black, 0 0 0.5em black, 0 0 0.5em black;' +
+                'pointer-events: none;' +
+                '-webkit-text-size-adjust:none;' +
+                '}'
+            )
+            .appendTo("head");
     };
 
     offle.updatePortalCounter = function () {
@@ -210,7 +238,7 @@ function wrapper(plugin_info) {
         if (confirm("Are you sure to permanently delete ALL the stored portals?")) {
             localStorage.removeItem('portalDb');
             offle.portalDb = {};
-            offle.portalLayerGroup.clearLayers();
+            offle.clearLayer();
             offle.updatePortalCounter();
         }
 
@@ -284,8 +312,8 @@ function wrapper(plugin_info) {
     offle.zoomToPortalAndShow = function (guid) {
         var lat = offle.portalDb[guid].lat,
             lng = offle.portalDb[guid].lng,
-            ll = [lat,lng];
-        map.setView (ll, 14);
+            ll = [lat, lng];
+        map.setView(ll, 14);
         window.renderPortalDetails(guid);
     };
 
@@ -306,7 +334,7 @@ function wrapper(plugin_info) {
         var guids = Object.keys(offle.lastAddedDb);
         var portalListHtml = guids.map(function (guid) {
             var portal = offle.lastAddedDb[guid];
-            return '<a onclick="window.plugin.offle.zoomToPortalAndShow(\''+guid+'\');return false"' +
+            return '<a onclick="window.plugin.offle.zoomToPortalAndShow(\'' + guid + '\');return false"' +
                 (portal.unique ? 'style="color: #FF6200;"' : '') +
                 'href="/intel?pll=' + portal.latLng.lat + ',' + portal.latLng.lng + '">' + portal.name + '</a>';
         }).join('<br />');
@@ -327,42 +355,48 @@ function wrapper(plugin_info) {
         $('.offle-portal-counter').css('display', 'none');
     };
 
-    offle.export = function()
-    /* FIXME export is terribly slow and hangs the browser, needs some love */
-    {
-        var out = JSON.stringify(offle.portalDb);
-        var html = "<p><a onclick=\"document.getElementById(&quot;offleexport&quot;).select();\">Select all</a> and press CTRL+C to copy it.</p>" +
-            "<textarea readonly id=\"offleexport\" onclick=\"document.getElementById(&quot;offleexport&quot;).select();\" style=\"width:96%; height:250px; resize:vertical;\">" +
-            out + "</textarea>";
-        window.dialog({html:html, width:600, title:"Offle export"});
-    };
+    offle.export = function ()
+        /* FIXME export is terribly slow and hangs the browser, needs some love */
+        {
+            var out = JSON.stringify(offle.portalDb);
+            var html = "<p><a onclick=\"document.getElementById(&quot;offleexport&quot;).select();\">Select all</a> and press CTRL+C to copy it.</p>" +
+                "<textarea readonly id=\"offleexport\" onclick=\"document.getElementById(&quot;offleexport&quot;).select();\" style=\"width:96%; height:250px; resize:vertical;\">" +
+                out + "</textarea>";
+            window.dialog({
+                html: html,
+                width: 600,
+                title: "Offle export"
+            });
+        };
 
-    offle.import = function()
-    {
+    offle.import = function () {
         // (?:[a-f]|\d){32}\.\d{2}
         var re = /(?:[a-f]|\d){32}\.\d{2}/;
-        var is_guid = function(guid){
+        var is_guid = function (guid) {
             //return guid.search(re) !== -1;
             return guid.match(re) !== null;
             //return true;
         };
         var string_db = prompt("Please paste exported DB from clipboard:", "");
-        if(string_db !== null){
+        if (string_db !== null) {
             //debugger;
             var portal_db = JSON.parse(string_db);
             var guids = Object.keys(portal_db);
             var len = guids.length;
             var old_len = Object.keys(offle.portalDb).length;
-            for(var i = 0; i != len; ++i){
+            for (var i = 0; i != len; ++i) {
                 var guid = guids[i];
-                if(!is_guid(guid)){
+                if (!is_guid(guid)) {
                     continue;
                 }
                 var obj = portal_db[guid];
-                if(!obj.hasOwnProperty("lat") || !obj.hasOwnProperty("lng")) {
+                if (!obj.hasOwnProperty("lat") || !obj.hasOwnProperty("lng")) {
                     continue;
                 }
-                offle.portalDb[guid] = {"lat":obj.lat,"lng":obj.lng};
+                offle.portalDb[guid] = {
+                    "lat": obj.lat,
+                    "lng": obj.lng
+                };
                 offle.portalDb[guid].name = obj.name;
                 offle.portalDb[guid].mission = obj.mission;
             }
@@ -386,7 +420,7 @@ function wrapper(plugin_info) {
         }
 
         map.on('movestart', function () {
-            offle.portalLayerGroup.clearLayers();
+            offle.clearLayer();
         });
         map.on('moveend', offle.onMapMove);
         window.addHook('portalAdded', offle.portalAdded);
