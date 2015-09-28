@@ -4,6 +4,8 @@
         "L": true,
         "map": true,
         "$": true,
-        "GM_info": true
+        "GM_info": true,
+        "plugin": true,
+        "localforage":true
     }
 }
