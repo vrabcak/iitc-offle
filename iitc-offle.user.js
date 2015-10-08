@@ -361,13 +361,13 @@ function wrapper(plugin_info) {
         {
             var out = JSON.stringify(offle.portalDb);
             var html = "<p><a onclick=\"document.getElementById(&quot;offleexport&quot;).select();\">Select all</a> and press CTRL+C to copy it.</p>" +
-                "<textarea readonly id=\"offleexport\" onclick=\"document.getElementById(&quot;offleexport&quot;).select();\" style=\"width:96%; height:250px; resize:vertical;\">" +
-                out + "</textarea>";
+                "<textarea readonly id=\"offleexport\" onclick=\"document.getElementById(&quot;offleexport&quot;).select();\" style=\"width:96%; height:250px; resize:vertical;\"></textarea>";
             window.dialog({
                 html: html,
                 width: 600,
                 title: "Offle export"
             });
+            document.getElementById("offleexport").textContent = out;
         };
 
     offle.import = function () {
