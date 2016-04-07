@@ -2,7 +2,7 @@
 // @id             iitc-plugin-offle
 // @name           IITC plugin: offle
 // @category       Misc
-// @version        0.6.3
+// @version        0.7.0
 // @namespace      https://github.com/vrabcak/iitc-offle
 // @description    Offle
 // @include        https://www.ingress.com/intel*
@@ -293,10 +293,12 @@ function wrapper(plugin_info) {
             '" size="5" onchange="window.plugin.offle.changeMaxVisibleCount(event)"> </div>' +
             '<div style="border-bottom: 60px;">' +
             '<button onclick="window.plugin.offle.showLAWindow();return false;">New portals</button>' +
-            '<button onClick="window.plugin.offle.export();return false;">Export</button>' +
-            '<button onClick="window.plugin.offle.import();return false;">Import</button>' +
+            '<button onClick="window.plugin.offle.export();return false;">Export JSON</button>' +
+            '<button onClick="window.plugin.offle.exportKML();return false;">Export KML</button>' +
+            '<button onClick="window.plugin.offle.import();return false;">Import JSON</button>' +
             '</div><br/>'+
-            '<a href="" id="dataDownloadLink" download="offle-export.json" style="display: none"> click to download </a>'+
+            '<a href="" id="dataDownloadLink" download="" style="display: none" onclick="this.style.display=\'none\'">' +
+            'click to download </a>' +
             '<br/><br/>' +
             '<button onclick="window.plugin.offle.clearDb();return false;" style="font-size: 5px;">' +
             'Clear all offline portals</button>' +
@@ -364,9 +366,10 @@ function wrapper(plugin_info) {
             var blobDb = new Blob([jsonDb], {type: "application/json"});
             var dataDownlodaLinkEl = document.getElementById('dataDownloadLink');
             dataDownlodaLinkEl.href = URL.createObjectURL(blobDb);
+            dataDownlodaLinkEl.download = 'offle-export.json';
             dataDownlodaLinkEl.style.display='block';
         };
-
+        
     offle.import = function () {
         // (?:[a-f]|\d){32}\.\d{2}
         var re = /(?:[a-f]|\d){32}\.\d{2}/;
@@ -404,6 +407,47 @@ function wrapper(plugin_info) {
             offle.renderVisiblePortals();
         }
     };
+    
+    offle.exportKML = function() {
+        var kmlBlob;
+        var dataDownlodaLinkEl = document.getElementById('dataDownloadLink');
+        var kml = '<?xml version="1.0" encoding="UTF-8"?>\n' +
+                  '<kml xmlns="http://www.opengis.net/kml/2.2">\n' +
+                  '<Document>\n'
+        
+        Object.keys(offle.portalDb).forEach(
+            function (guid) {
+                var name, escapedName;
+                var obj = offle.portalDb[guid];
+                if (!obj.hasOwnProperty('lat') || !obj.hasOwnProperty('lng')) {
+                    return;
+                };
+                if (obj.hasOwnProperty('name') && obj.name) {
+                    name = obj.name;
+                } else {
+                    name = guid;
+                }
+         
+                escapedName = name.replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&apos;');
+                
+                kml += '<Placemark>\n';
+                kml += '<name>' + escapedName + '</name>\n';
+                kml += '<Point><coordinates>'+ obj.lng +','+ obj.lat +',0</coordinates></Point>\n';
+                kml += '</Placemark>\n'
+            }
+        )
+       
+        kml += '</Document>\n</kml>'
+        
+        kmlBlob = new Blob([kml],{type:'application/vnd.google-earth.kml+xml'});
+        dataDownlodaLinkEl.href = URL.createObjectURL(kmlBlob);
+        dataDownlodaLinkEl.download = 'ingress-portals.kml';
+        dataDownlodaLinkEl.style.display='block';
+    }
 
     var setup = function () {
         offle.setupLayer();
