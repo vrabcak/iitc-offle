@@ -2,7 +2,7 @@
 // @id             iitc-plugin-offle
 // @name           IITC plugin: offle
 // @category       Misc
-// @version        0.6.2
+// @version        0.6.3
 // @namespace      https://github.com/vrabcak/iitc-offle
 // @description    Offle
 // @include        https://www.ingress.com/intel*
@@ -295,7 +295,9 @@ function wrapper(plugin_info) {
             '<button onclick="window.plugin.offle.showLAWindow();return false;">New portals</button>' +
             '<button onClick="window.plugin.offle.export();return false;">Export</button>' +
             '<button onClick="window.plugin.offle.import();return false;">Import</button>' +
-            '</div><br/><br/><br/>' +
+            '</div><br/>'+
+            '<a href="" id="dataDownloadLink" download="offle-export.json" style="display: none"> click to download </a>'+
+            '<br/><br/>' +
             '<button onclick="window.plugin.offle.clearDb();return false;" style="font-size: 5px;">' +
             'Clear all offline portals</button>' +
             '</div>';
@@ -357,17 +359,12 @@ function wrapper(plugin_info) {
     };
 
     offle.export = function ()
-        /* FIXME export is terribly slow and hangs the browser, needs some love */
         {
-            var out = JSON.stringify(offle.portalDb);
-            var html = "<p><a onclick=\"document.getElementById(&quot;offleexport&quot;).select();\">Select all</a> and press CTRL+C to copy it.</p>" +
-                "<textarea readonly id=\"offleexport\" onclick=\"document.getElementById(&quot;offleexport&quot;).select();\" style=\"width:96%; height:250px; resize:vertical;\"></textarea>";
-            window.dialog({
-                html: html,
-                width: 600,
-                title: "Offle export"
-            });
-            document.getElementById("offleexport").textContent = out;
+            var jsonDb = JSON.stringify(offle.portalDb);
+            var blobDb = new Blob([jsonDb], {type: "application/json"});
+            var dataDownlodaLinkEl = document.getElementById('dataDownloadLink');
+            dataDownlodaLinkEl.href = URL.createObjectURL(blobDb);
+            dataDownlodaLinkEl.style.display='block';
         };
 
     offle.import = function () {
