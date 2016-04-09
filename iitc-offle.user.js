@@ -124,8 +124,8 @@ function wrapper(plugin_info) {
 
         portalMarker.addTo(offle.portalLayerGroup);
 
-        if (plugin.keys) {
-            var keyCount = plugin.keys.keys[guid];
+        if (window.plugin.keys) {
+            var keyCount = window.plugin.keys.keys[guid];
             if (keyCount > 0) {
                 var keyMarker = L.marker(offle.portalDb[guid], {
                     icon: L.divIcon({
@@ -164,8 +164,8 @@ function wrapper(plugin_info) {
     };
 
     offle.setupCSS = function () {
-        $("<style>")
-            .prop("type", "text/css")
+        $('<style>')
+            .prop('type', 'text/css')
             .html('.offle-marker {' +
                 'font-size: 30px;' +
                 'color: #FF6200;' +
@@ -196,7 +196,7 @@ function wrapper(plugin_info) {
                 '-webkit-text-size-adjust:none;' +
                 '}'
             )
-            .appendTo("head");
+            .appendTo('head');
     };
 
     offle.updatePortalCounter = function () {
@@ -236,7 +236,7 @@ function wrapper(plugin_info) {
 
     offle.clearDb = function () {
 
-        if (confirm("Are you sure to permanently delete ALL the stored portals?")) {
+        if (confirm('Are you sure to permanently delete ALL the stored portals?')) {
             localforage.removeItem('portalDb');
             offle.portalDb = {};
             offle.clearLayer();
@@ -296,8 +296,8 @@ function wrapper(plugin_info) {
             '<button onClick="window.plugin.offle.export();return false;">Export JSON</button>' +
             '<button onClick="window.plugin.offle.exportKML();return false;">Export KML</button>' +
             '<button onClick="window.plugin.offle.import();return false;">Import JSON</button>' +
-            '<input type="file" id="fileInput" style="visibility: hidden">'+
-            '</div><br/>'+
+            '<input type="file" id="fileInput" style="visibility: hidden">' +
+            '</div><br/>' +
             '<a href="" id="dataDownloadLink" download="" style="display: none" onclick="this.style.display=\'none\'">' +
             'click to download </a>' +
             '<br/><br/>' +
@@ -361,85 +361,85 @@ function wrapper(plugin_info) {
         $('.offle-portal-counter').css('display', 'none');
     };
 
-    offle.export = function ()
-        {
-            var jsonDb = JSON.stringify(offle.portalDb);
-            var blobDb = new Blob([jsonDb], {type: "application/json"});
-            var dataDownlodaLinkEl = document.getElementById('dataDownloadLink');
-            dataDownlodaLinkEl.href = URL.createObjectURL(blobDb);
-            dataDownlodaLinkEl.download = 'offle-export.json';
-            dataDownlodaLinkEl.style.display='block';
-        };
-        
+    offle.export = function () {
+        var jsonDb = JSON.stringify(offle.portalDb);
+        var blobDb = new Blob([jsonDb], {
+            type: 'application/json'
+        });
+        var dataDownlodaLinkEl = document.getElementById('dataDownloadLink');
+        dataDownlodaLinkEl.href = URL.createObjectURL(blobDb);
+        dataDownlodaLinkEl.download = 'offle-export.json';
+        dataDownlodaLinkEl.style.display = 'block';
+    };
+
     offle.import = function () {
         var fileInputEl = document.getElementById('fileInput');
-        
+
         function is_guid(guid) {
             var re = /(?:[a-f]|\d){32}\.\d{2}/;
             return guid.match(re) !== null;
-        };
-        
-        function parseJSONAndImport (string_db) {
-          var portal_db;
-          if (string_db !== null) {
-              try {
-                  portal_db = JSON.parse(string_db);
-              }
-              catch(err) {
-                window.alert("Not valid portal database: " + err);
-                return;
-              }
-              var guids = Object.keys(portal_db);
-              var len = guids.length;
-              var old_len = Object.keys(offle.portalDb).length;
-              for (var i = 0; i != len; ++i) {
-                  var guid = guids[i];
-                  if (!is_guid(guid)) {
-                      continue;
-                  }
-                  var obj = portal_db[guid];
-                  if (!obj.hasOwnProperty("lat") || !obj.hasOwnProperty("lng")) {
-                      continue;
-                  }
-                  offle.portalDb[guid] = {
-                      "lat": obj.lat,
-                      "lng": obj.lng
-                  };
-                  offle.portalDb[guid].name = obj.name;
-                  offle.portalDb[guid].mission = obj.mission;
-              }
-              var new_len = Object.keys(offle.portalDb).length;
-              offle.dirtyDb = true;
-              window.alert("Portals processed: " + len + ", portals added:" + (new_len - old_len) + ".");
-              offle.renderVisiblePortals();
-          }
         }
-          
-        function handleFile () {
-           var reader = new FileReader();
+
+        function parseJSONAndImport(string_db) {
+            var portal_db;
+            if (string_db !== null) {
+                try {
+                    portal_db = JSON.parse(string_db);
+                } catch (err) {
+                    window.alert('Not valid portal database: \n' + err);
+                    return;
+                }
+                var guids = Object.keys(portal_db);
+                var len = guids.length;
+                var old_len = Object.keys(offle.portalDb).length;
+                for (var i = 0; i != len; ++i) {
+                    var guid = guids[i];
+                    if (!is_guid(guid)) {
+                        continue;
+                    }
+                    var obj = portal_db[guid];
+                    if (!obj.hasOwnProperty('lat') || !obj.hasOwnProperty('lng')) {
+                        continue;
+                    }
+                    offle.portalDb[guid] = {
+                        'lat': obj.lat,
+                        'lng': obj.lng
+                    };
+                    offle.portalDb[guid].name = obj.name;
+                    offle.portalDb[guid].mission = obj.mission;
+                }
+                var new_len = Object.keys(offle.portalDb).length;
+                offle.dirtyDb = true;
+                window.alert('Portals processed: ' + len + ', portals added:' + (new_len - old_len) + '.');
+                offle.renderVisiblePortals();
+            }
+        }
+
+        function handleFile() {
+            var reader = new FileReader();
             if (this.files.length === 0) {
-             return;
-           }
-           console.log( this.files[0].name, this.files[0].type );
-           reader.onload = function(e) {
-               parseJSONAndImport(e.target.result);
-           };
-           reader.readAsText(this.files[0]);
-           fileInputEl.removeEventListener('change', handleFile, false);
+                return;
+            }
+            console.log(this.files[0].name, this.files[0].type);
+            reader.onload = function (e) {
+                parseJSONAndImport(e.target.result);
+            };
+            reader.readAsText(this.files[0]);
+            fileInputEl.removeEventListener('change', handleFile, false);
         }
-          
+
         fileInputEl.click();
-        fileInputEl.addEventListener('change', handleFile, false); 
-               
+        fileInputEl.addEventListener('change', handleFile, false);
+
     };
-    
-    offle.exportKML = function() {
+
+    offle.exportKML = function () {
         var kmlBlob;
         var dataDownlodaLinkEl = document.getElementById('dataDownloadLink');
         var kml = '<?xml version="1.0" encoding="UTF-8"?>\n' +
-                  '<kml xmlns="http://www.opengis.net/kml/2.2">\n' +
-                  '<Document>\n';
-        
+            '<kml xmlns="http://www.opengis.net/kml/2.2">\n' +
+            '<Document>\n';
+
         Object.keys(offle.portalDb).forEach(
             function (guid) {
                 var name, escapedName;
@@ -452,26 +452,28 @@ function wrapper(plugin_info) {
                 } else {
                     name = guid;
                 }
-         
+
                 escapedName = name.replace(/&/g, '&amp;')
                     .replace(/</g, '&lt;')
                     .replace(/>/g, '&gt;')
                     .replace(/"/g, '&quot;')
                     .replace(/'/g, '&apos;');
-                
+
                 kml += '<Placemark>\n';
                 kml += '<name>' + escapedName + '</name>\n';
-                kml += '<Point><coordinates>'+ obj.lng +','+ obj.lat +',0</coordinates></Point>\n';
+                kml += '<Point><coordinates>' + obj.lng + ',' + obj.lat + ',0</coordinates></Point>\n';
                 kml += '</Placemark>\n';
             }
         );
-       
+
         kml += '</Document>\n</kml>';
-        
-        kmlBlob = new Blob([kml],{type:'application/vnd.google-earth.kml+xml'});
+
+        kmlBlob = new Blob([kml], {
+            type: 'application/vnd.google-earth.kml+xml'
+        });
         dataDownlodaLinkEl.href = URL.createObjectURL(kmlBlob);
         dataDownlodaLinkEl.download = 'ingress-portals.kml';
-        dataDownlodaLinkEl.style.display='block';
+        dataDownlodaLinkEl.style.display = 'block';
     };
 
     var setup = function () {
