@@ -2,13 +2,13 @@
 // @id             iitc-plugin-offle
 // @name           IITC plugin: offle
 // @category       Misc
-// @version        0.7.1
+// @version        0.7.2
 // @namespace      https://github.com/vrabcak/iitc-offle
 // @description    Offle
-// @include        https://www.ingress.com/intel*
-// @include        http://www.ingress.com/intel*
-// @match          https://www.ingress.com/intel*
-// @match          http://www.ingress.com/intel*
+// @include        https://*.ingress.com/intel*
+// @include        http://*.ingress.com/intel*
+// @match          https://*.ingress.com/intel*
+// @match          http://*.ingress.com/intel*
 // @grant          none
 // @require        https://github.com/mozilla/localForage/releases/download/1.2.10/localforage.js
 // ==/UserScript==
